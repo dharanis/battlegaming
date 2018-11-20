@@ -53,12 +53,15 @@ public class ItemController {
 
     @GetMapping("/get/item/{id}")
     public Item getItemById(@PathVariable Long id){
-        return itemService.getItemById(id);
+        return itemService.getItem(id);
     }
 
 }
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Item by Name not found")
 class ItemByNameNotFound extends RuntimeException {
+}
+@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Item by Id not found")
+class ItemNotFoundById extends RuntimeException {
 }
 

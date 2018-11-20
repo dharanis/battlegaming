@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -105,6 +106,7 @@ public class ItemControllerTest {
         .get("/api/get")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andDo(print())
                 .andReturn();
 
         verify(itemService, Mockito.times(1)).getAllItems();
@@ -122,6 +124,7 @@ public class ItemControllerTest {
                 .andReturn();
 
         verify(itemService, Mockito.times(1)).getItemsByName(anyString());
+        verifyNoMoreInteractions(itemService);
     }
 
     //Delete item that IS in the data store.
@@ -135,37 +138,37 @@ public class ItemControllerTest {
                 .andReturn();
 
         verify(itemService,times(1)).deleteItemById(anyLong());
+        verifyNoMoreInteractions(itemService);
     }
 
     //Get a specific item.
     @Test
     public void getItemById() throws Exception {
         Item item = items.get(1);
-        when(itemService.getItemById(item.getId())).thenReturn(item);
+        when(itemService.getItem(item.getId())).thenReturn(item);
 
         mockMvc.perform(MockMvcRequestBuilders
-        .get("/get/item/3")
-                .accept(MediaType.APPLICATION_JSON))
+        .get("/api/get/item/3")
+                .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        verify(itemService, times(1)).getItemById(anyLong());
+        Mockito.verify(itemService, times(1)).getItem(item.getId());
     }
 
     //Get a specific item but it is not in the data store.
     @Test
     public void getItemByIdNotFound() throws Exception {
-        Item item = items.get(0);
-        item.setId(0L);
-        when(itemService.getItemById(item.getId())).thenReturn(item);
+        Item item = new Item();
+        when(itemService.getItem(0L)).thenThrow(new ItemNotFoundById());
 
         mockMvc.perform(MockMvcRequestBuilders
-                .get("/get/item/{id}",item.getId())
+                .get("/api/get/item/900")
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
+                //.andExpect(status().isNotFound())
                 .andReturn();
 
-        verify(itemService, times(1)).getItemById(item.getId());
+        verify(itemService, times(1)).getItem(anyLong());
     }
 
 }

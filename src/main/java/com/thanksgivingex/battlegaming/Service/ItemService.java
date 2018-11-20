@@ -55,10 +55,10 @@ public class ItemService {
         LOGGER.info("Item with ID :"+id+" got deleted");
     }
 
-    public Item getItemById(Long id) {
+    public Item getItem(Long id) {
         Optional<Item> item = itemRepository.findById(id);
         if(!item.isPresent()) {
-            LOGGER.info("inside service class");
+            LOGGER.info("The item with ID is not present");
             throw new ItemNotFoundById();
         }
           return item.get();
