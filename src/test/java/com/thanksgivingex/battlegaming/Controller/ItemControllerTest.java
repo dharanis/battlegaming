@@ -56,7 +56,7 @@ public class ItemControllerTest {
     }
 
     @After
-    public void tearDown(){}
+    public void tearDown(){ }
 
 
     //Create where object not in data store.
@@ -81,7 +81,7 @@ public class ItemControllerTest {
     //Create where object is in data store.
     @Test
     public void updateItem() throws Exception {
-        Item item = items.get(0);
+        Item item = items.get(1);
         when(itemService.saveItem(item)).thenReturn(item);
 
         mockMvc.perform(MockMvcRequestBuilders
@@ -135,6 +135,37 @@ public class ItemControllerTest {
                 .andReturn();
 
         verify(itemService,times(1)).deleteItemById(anyLong());
+    }
+
+    //Get a specific item.
+    @Test
+    public void getItemById() throws Exception {
+        Item item = items.get(1);
+        when(itemService.getItemById(item.getId())).thenReturn(item);
+
+        mockMvc.perform(MockMvcRequestBuilders
+        .get("/get/item/3")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        verify(itemService, times(1)).getItemById(anyLong());
+    }
+
+    //Get a specific item but it is not in the data store.
+    @Test
+    public void getItemByIdNotFound() throws Exception {
+        Item item = items.get(0);
+        item.setId(0L);
+        when(itemService.getItemById(item.getId())).thenReturn(item);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/get/item/{id}",item.getId())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andReturn();
+
+        verify(itemService, times(1)).getItemById(item.getId());
     }
 
 }

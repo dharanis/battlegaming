@@ -51,6 +51,11 @@ public class ItemController {
         itemService.deleteItemById(id);
     }
 
+    @GetMapping("/get/item/{id}")
+    public Item getItemById(@PathVariable Long id){
+        return itemService.getItemById(id);
+    }
+
 }
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Item by Name not found")

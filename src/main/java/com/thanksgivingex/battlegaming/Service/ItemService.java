@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Optional;
 
 @Service
 public class ItemService {
@@ -53,9 +54,24 @@ public class ItemService {
         itemRepository.deleteById(id);
         LOGGER.info("Item with ID :"+id+" got deleted");
     }
+
+    public Item getItemById(Long id) {
+        Optional<Item> item = itemRepository.findById(id);
+        if(!item.isPresent()) {
+            LOGGER.info("inside service class");
+            throw new ItemNotFoundById();
+        }
+          return item.get();
+    }
+
+
 }
 
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Item by Id not found to delete")
 class DeleteItemByIdNotFound extends RuntimeException {
+}
+
+@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Item by Id not found")
+class ItemNotFoundById extends RuntimeException {
 }
